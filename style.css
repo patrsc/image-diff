@@ -1,0 +1,11 @@
+html {
+    height: 100%;
+    background: #f3f3f3;
+    font-size: 11pt;
+}
+body {
+    font-family: --apple-system, system-ui, system, sans-serif;
+    height: 100%;
+    margin: 0;
+    background: #f3f3f3;
+}
