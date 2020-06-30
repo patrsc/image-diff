@@ -45,8 +45,8 @@ app.on('activate', () => {
 function createWindow () {
     // Create the browser window.
     win = new BrowserWindow({
-        width: 900,
-        height: 600,
+        width: 1200,
+        height: 800,
         minWidth: 600,
         minHeight: 480,
         webPreferences: {
@@ -59,10 +59,10 @@ function createWindow () {
     win.loadFile('index.html')
 
     // Open the DevTools.
-    /*win.webContents.openDevTools()
+    win.webContents.openDevTools()
     win.webContents.on('devtools-opened', () => {
         win.webContents.focus()
-    })*/
+    })
 }
 
 function getArguments() {
