@@ -60,9 +60,6 @@ function createWindow () {
 
     // Open the DevTools.
     win.webContents.openDevTools()
-    win.webContents.on('devtools-opened', () => {
-        win.webContents.focus()
-    })
 }
 
 function getArguments() {
