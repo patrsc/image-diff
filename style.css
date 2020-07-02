@@ -74,6 +74,9 @@ body {
 .thumbnail[data-active="true"] img {
     border-color: #3a98fc;
 }
+.thumbnail[data-hidden="true"] {
+    display: none;
+}
 #content-container {
     padding: 20px;
     display: flex;

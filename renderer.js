@@ -1,7 +1,7 @@
 "use strict";
 
 // requires
-const { remote, ipcRenderer } = require('electron')
+const { remote, ipcRenderer, shell } = require('electron')
 const { BrowserWindow, dialog } = remote
 const util = require('util')
 const fs = require('fs')
@@ -14,9 +14,8 @@ main()
 
 // functions
 async function main() {
-    // ipcRenderer.on('update', updateFiles)
     addKeyboardShortcuts()
-    showSidebarThumbnails(Object.keys(clusters))
+    showSidebarThumbnails()
 }
 
 function addKeyboardShortcuts() {
@@ -32,6 +31,24 @@ function closeWindow() {
     window.close()
 }
 
+function getFirstImage(cluster) {
+    let keys = Object.keys(cluster)
+    if (keys.length > 0) {
+        return keys[0]
+    }
+}
+
+function showSidebarThumbnails() {
+    let sidebar = getSidebar()
+    sidebar.innerHTML = ""
+    for (let i = 0; i < clusters.length; i++) {
+        let imagePath = getFirstImage(clusters[i])
+        let t = newThumbnail(imagePath, "vertical", () => showCluster(i))
+        sidebar.append(t)
+    }
+    showCluster(0)
+}
+
 function getSidebar() {
     return document.getElementById("sidebar")
 }
@@ -40,15 +57,9 @@ function getDownbar() {
     return document.getElementById("image-thumbs")
 }
 
-function showCluster(refImage) {
-    setActiveThumbnail(getSidebar(), refImage)
-    let cluster = {[refImage]: 0, ...clusters[refImage]}
-    showClusterThumbnails(cluster)
-}
-
-function showSidebarThumbnails(imagePaths) {
-    let sidebar = getSidebar()
-    showThumbnails(sidebar, "vertical", imagePaths, showCluster, clusters)
+function showCluster(num) {
+    setActiveThumbnailNum(getSidebar(), num)
+    showClusterThumbnails(clusters[num])
 }
 
 function showClusterThumbnails(cluster) {
@@ -57,19 +68,21 @@ function showClusterThumbnails(cluster) {
     showThumbnails(downbar, "horizontal", imagePaths, showImage, cluster)
 }
 
-function showThumbnails(element, orientation, imagePaths, showFunction, details) {
+function showThumbnails(element, orientation, imagePaths, showFunction, cluster) {
     element.innerHTML = ""
-    for (let i of imagePaths) {
-        let imageDetails = details[i]
-        let t = newThumbnail(i, orientation, showFunction, imageDetails)
+    for (let imagePath of imagePaths) {
+        let imageDetails = cluster[imagePath]
+        let t = newThumbnail(imagePath, orientation, () => showFunction(imagePath, imageDetails))
         element.append(t)
     }
-    showFunction(imagePaths[0], details[imagePaths[0]])
+    if (imagePaths.length > 0) {
+        showFunction(imagePaths[0], cluster[imagePaths[0]])
+    }
 }
 
-function newThumbnail(imagePath, orientation, showFunction, imageDetails) {
+function newThumbnail(imagePath, orientation, showFunction) {
     let e = newImage(imagePath)
-    e.addEventListener("click", () => showFunction(imagePath, imageDetails))
+    e.addEventListener("click", showFunction)
     let t = document.createElement("div")
     t.className = "thumbnail " + orientation
     t.appendChild(e)
@@ -113,11 +126,23 @@ function setActiveThumbnail(container, path) {
     }
 }
 
-function getActiveThumbnailPath(container) {
-    for (let e of container.childNodes) {
+function setActiveThumbnailNum(container, num) {
+    let children = container.childNodes
+    for (let i = 0; i < children.length; i++) {
+        let e = children[i]
         let img = e.firstChild
-        if (e.getAttribute("data-active") == "true") {
-            return img.getAttribute("src")
+        setActive(e, i == num)
+    }
+}
+
+function deleteCurrentImage() {
+    let path = getCurrentImage()
+    if (path) {
+        let num = getSelectedCluster()
+        let deleted = deleteFile(path)
+        if (deleted) {
+            removeImageFromAllClusters(path)
+            showCluster(num)
         }
     }
 }
@@ -127,17 +152,53 @@ function getCurrentImage() {
     return e.firstChild.getAttribute("src")
 }
 
-function deleteCurrentImage() {
-    let path = getCurrentImage()
-    if (path) {
-        console.log("Del: " + path)
-        let refImage = getActiveThumbnailPath(getSidebar())
-        console.log(refImage)
-        delete clusters[refImage][path]
-        console.log(clusters[refImage])
-        showCluster(refImage)
-        if (Object.keys(clusters[refImage]).length == 0) {
-            console.log("rm cluster")
+function getSelectedCluster() {
+    let container = getSidebar()
+    let children = container.childNodes
+    for (let i = 0; i < children.length; i++) {
+        let e = children[i]
+        let img = e.firstChild
+        if (e.getAttribute("data-active") == "true") {
+            return i
         }
     }
+}
+
+function removeImageFromAllClusters(path) {
+    for (let i = 0; i < clusters.length; i++) {
+        if (path in clusters[i]) {
+            delete clusters[i][path]
+            updateSidebarImage(i)
+            if (Object.keys(clusters[i]).length <= 1) {
+                // cluster contains 1 or no images
+                hideClusterInSidebar(i)
+            }
+        }
+    }
+}
+
+function hideClusterInSidebar(num) {
+    let container = getSidebar()
+    let thumbnail = getSidebar().childNodes[num]
+    thumbnail.setAttribute("data-hidden", true)
+}
+
+function updateSidebarImage(num) {
+    let imagePath = getFirstImage(clusters[num])
+    let container = getSidebar()
+    let thumbnail = container.childNodes[num]
+    let img = thumbnail.firstChild
+    if (imagePath) {
+        img.setAttribute("src", imagePath)
+    } else {
+        img.setAttribute("src", "")
+    }
+}
+
+function deleteFile(path) {
+    let deleted = shell.moveItemToTrash(path)
+    if (!deleted) {
+        alert(`The file ${path} could not be deleted.`)
+    }
+    return deleted
 }

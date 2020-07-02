@@ -28,15 +28,15 @@ def getHashes(rootDir):
 
 def getClusters(hashes, threshold):
     files = list(hashes.keys())
-    clusters = {}
+    clusters = []
     for i, f in enumerate(files):
         similar = {}
-        for j in range(i+1, len(files)):
+        for j in range(i, len(files)):
             d = hashes[files[i]] - hashes[files[j]]
-            if (d < threshold):
+            if (d <= threshold):
                 similar[files[j]] = d
-        if len(similar.keys()) > 0:
-            clusters[files[i]] = similar
+        if len(similar.keys()) > 1:
+            clusters.append(similar)
     return clusters
 
 def writeJson(file, data):
