@@ -115,8 +115,8 @@ function showImage(imagePath, difference) {
     let info = document.getElementById("content-bottom")
     let string = `${width} &times; ${height} px &mdash; ${sizeMiB.toFixed(3)} MiB &mdash; Difference: ${difference}`
     info.innerHTML = string
-    let location = document.getElementById("content-top")
-    location.innerHTML = imagePath
+    let content = document.getElementById("content-top")
+    content.innerHTML = `<div>${imagePath}</div><div class="help-text">Press <kbd>← backspace</kbd> to move this file to the trash bin.<div>`
 }
 
 function setActiveThumbnail(container, path) {
