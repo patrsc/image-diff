@@ -34,7 +34,7 @@ def getClusters(hashes, threshold):
         for j in range(i, len(files)):
             d = hashes[files[i]] - hashes[files[j]]
             if (d <= threshold):
-                similar[files[j]] = d
+                similar[files[j]] = int(d)
         if len(similar.keys()) > 1:
             clusters.append(similar)
     return clusters
