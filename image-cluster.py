@@ -3,7 +3,7 @@ from util import readJson, writeJson, getClusters
 
 
 def main():
-    threshold = int(sys.argv[1])
+    threshold = float(sys.argv[1])
     inFile = "hashes.json"
     outFile = "clusters.json"
     hashes = readJson(inFile)
