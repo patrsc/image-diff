@@ -9,11 +9,11 @@ from hashes import get_algorithm
 def getHashes(rootDir, algorithm="PerceptualHash"):
     # Walk directory and get hashes
     hashes = {}
+    cls = get_algorithm(algorithm)
     for dirName, subdirList, fileList in os.walk(rootDir):
         for fname in fileList:
             fullPath = dirName + "/" + fname
             print("Hashing: %s" % fullPath)
-            cls = get_algorithm(algorithm)
             if is_image_file(fullPath):
                 h = cls.hash_file(fullPath)
                 hashes[fullPath] = h.encode()

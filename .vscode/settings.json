@@ -1,7 +1,12 @@
 {
     "cSpell.words": [
+        "bitorder",
+        "frombuffer",
         "imagededup",
         "linalg",
-        "phash"
+        "packbits",
+        "phash",
+        "tobytes",
+        "unpackbits"
     ]
 }

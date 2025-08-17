@@ -49,6 +49,22 @@ def get_algorithm(name: str) -> type[AbstractHash]:
     return get_algorithms()[name]
 
 
+def bool_matrix_to_hex(matrix):
+    """Convert an n x n boolean matrix into a hex string."""
+    arr = np.asarray(matrix, dtype=np.uint8).ravel()
+    arr = arr.reshape(-1, 8)
+    byte_vals = np.packbits(arr, axis=1, bitorder="big").ravel()
+    return byte_vals.tobytes().hex()
+
+
+def hex_to_bool_matrix(hex_string):
+    """Convert a hex string into an n x n boolean matrix."""
+    byte_vals = np.frombuffer(bytes.fromhex(hex_string), dtype=np.uint8)
+    bits = np.unpackbits(byte_vals, bitorder="big")
+    n = int(bits.size**0.5)
+    return bits.reshape(n, n).astype(bool)
+
+
 class PerceptualHash(AbstractHash):
     """Perceptual hash."""
     @classmethod
@@ -56,13 +72,13 @@ class PerceptualHash(AbstractHash):
         return cls(imagehash.phash(Image.open(file), hash_size=8))
 
     def encode(self):
-        e = self.hash.hash.tolist()
+        e = bool_matrix_to_hex(self.hash.hash)
         assert self.hash == self.decode(e).hash, "encoded value does not match decoded value"
         return e
 
     @classmethod
     def decode(cls, e):
-        h = imagehash.ImageHash(np.array(e, dtype=bool))
+        h = imagehash.ImageHash(hex_to_bool_matrix(e))
         return cls(h)
 
     def __sub__(self, other) -> float:
@@ -105,7 +121,7 @@ class NeuralHash(AbstractHash):
         h = encoder.encode_image(file)
         if h is None:
             raise ValueError("hasher returned None")
-        h = cls(h)
+        return cls(h)
 
     def encode(self):
         e = self.hash.tolist()
