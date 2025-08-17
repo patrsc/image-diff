@@ -139,4 +139,4 @@ class NeuralHash(AbstractHash):
         v2 = other.hash.flatten()
         num = np.dot(v1, v2)
         denom = np.linalg.norm(v1) * np.linalg.norm(v2)
-        return 1 - (num / denom)  # cosine distance
+        return abs(1 - (num / denom))  # cosine distance

@@ -2,6 +2,8 @@
 
 Python script and web UI for comparing and deleting similar or duplicate images in a folder.
 
+![screenshot](example.jpg)
+
 ## Requirements
 
 Requires [Python](https://www.python.org/) 3.12 and [Poetry](https://python-poetry.org/) and [Node](https://nodejs.org/) 20.
@@ -37,3 +39,25 @@ npm install
     ````
     npm start
     ````
+
+## Example
+
+The following code demonstrates a simple example:
+
+```bash
+# Download example image dataset
+poetry run python download_samples.py
+
+# Hash images
+poetry run python image_hash.py sample-images NeuralHash
+
+# Detect similar images
+poetry run python image_cluster.py 0.18
+
+# Start UI
+npm start
+```
+
+## License
+
+MIT

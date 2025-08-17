@@ -12,7 +12,8 @@ dependencies = [
     "imagehash (>=4.3.2,<5.0.0)",
     "torch (>=2.2.0,<2.3.0)",
     "imagededup (>=0.3.3.post2,<0.4.0)",
-    "numpy (<2)"
+    "numpy (<2)",
+    "aiohttp (>=3.12.15,<4.0.0)"
 ]
 
 
