@@ -41,6 +41,10 @@ function getFirstImage(cluster) {
 function showSidebarThumbnails() {
     let sidebar = getSidebar()
     sidebar.innerHTML = ""
+    if (clusters.length == 0) {
+        sidebar.innerHTML = `<div class="text-muted text-center p-3">No similar images found.</div>`
+        return
+    }
     for (let i = 0; i < clusters.length; i++) {
         let imagePath = getFirstImage(clusters[i])
         let t = newThumbnail(imagePath, "vertical", () => showCluster(i))
