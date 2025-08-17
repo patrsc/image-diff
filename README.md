@@ -1,6 +1,6 @@
 # image-diff
 
-Python script and web UI for comparing and deleting similar images in a folder.
+Python script and web UI for comparing and deleting similar or duplicate images in a folder.
 
 ## Requirements
 
